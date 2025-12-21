@@ -1,5 +1,6 @@
 const {getClient}=require("../config/telegram");
 const jwt = require("jsonwebtoken");
+const { Api } = require("telegram");
 let phoneCodeHashStore={};
 exports.sendOtp=async(req,res)=>{
     const{phone}=req.body;
@@ -15,7 +16,7 @@ exports.sendOtp=async(req,res)=>{
     phoneCodeHash: result.phoneCodeHash
   });
 };
-const { Api } = require("telegram");
+
 
 exports.verifyOtp = async (req, res) => {
   try {
@@ -40,7 +41,6 @@ exports.verifyOtp = async (req, res) => {
   } catch (err) {
     console.error(err);
 
-    // Common Telegram errors
     if (err.errorMessage === "SESSION_PASSWORD_NEEDED") {
       return res.status(401).json({
         error: "2FA enabled on this Telegram account. Disable it for prototype."

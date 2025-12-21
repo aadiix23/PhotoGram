@@ -1,18 +1,32 @@
-const {getClient}=require("../config/telegram");
-const {Api}=require("telegram");
-exports.uploadFile=async(req,res)=>{
-    const client =getClient();
-    const file=req.file;
+const { getClient } = require("../config/telegram");
+const File = require("../models/File")
+const { Api } = require("telegram");
+const fs = require("fs");
+
+exports.uploadFile = async (req, res) => {
+    const client = getClient();
+    if (!req.file) {
+        return res.status(400).json({ error: "No file uploaded" });
+    }
+
+    const file = req.file;
     const result = await client.sendFile(
         "me",
         {
-            file:file.path,
-            caption:file.originalname,
+            file: file.path,
+            caption: file.originalname,
         }
     );
+    const savedFile = await File.create({
+        userPhone: req.user.phone,
+        telegramMessageId: result.id,
+        fileName: req.file.originalname,
+        mimeType: req.file.mimetype,
+    });
+    fs.unlinkSync(req.file.path);
     res.json({
-        success:true,
-        telegramMessageId:result.id,
-        fileName:file.originalname,
+        success: true,
+        telegramMessageId: result.id,
+        fileName: file.originalname,
     });
 };
