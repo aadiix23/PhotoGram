@@ -30,3 +30,24 @@ exports.uploadFile = async (req, res) => {
         fileName: file.originalname,
     });
 };
+exports.getFiles=async (req,res)=>{
+    try {
+        const userPhone=req.user.phone;
+        const files=await File.find({userPhone}).sort({createdAt:-1});
+        const response=files.map(file=>({
+            id:file._id,
+            fileName:file.fileName,
+            mimeType:file.mimeType,
+            uploadedAt:file.createdAt,
+            viewUrl:`/files/view/${file._id}`
+        }));
+        res.json({
+            success:true,
+            files:response
+        })
+    } catch (error) {
+        console.error(err);
+        res.status(500).json({error:err.message});
+        
+    }
+};
