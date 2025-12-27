@@ -1,6 +1,9 @@
 const router=require("express").Router();
 const multer=require("multer");
-const {uploadFile}=require("../controllers/file.controller");
+const auth =require("../middleware/auth.middleware")
+const {uploadFile,getFiles,viewFile}=require("../controllers/file.controller");
 const upload=multer({dest:"uploads/"});
-router.post("/upload",upload.single("file"),uploadFile);
+router.post("/upload",auth,upload.single("file"),uploadFile);
+router.get("/",auth,getFiles);
+router.get("/view/:id",auth,viewFile);
 module.exports=router;
